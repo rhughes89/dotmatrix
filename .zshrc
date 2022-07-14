@@ -37,7 +37,7 @@ autoload colors; colors
 bindkey -e
 
 # options
-setopt appendhistory autocd extendedglob histignoredups nonomatch prompt_subst interactivecomments
+setopt appendhistory extendedglob histignoredups nonomatch prompt_subst interactivecomments
 
 # Bindings
 # external editor support
@@ -69,7 +69,13 @@ if [ -z "$TMUX" ]; then
 fi
 
 # prompt
-PROMPT='%{$fg_bold[green]%}%n@%m%{$reset_color%}:%{$fg_bold[cyan]%}%~%{$reset_color%}$(git_prompt_info "(%s)")%# '
+p=
+if [ -n "$SSH_CONNECTION" ]; then
+  p='%{$fg_bold[yellow]%}%n@%m'
+else
+  p='%{$fg_bold[green]%}%n@%m'
+fi
+PROMPT="$p%{\$reset_color%}:%{\$fg_bold[cyan]%}%~%{\$reset_color%}\$(git_prompt_info '(%s)')%# "
 
 # show non-success exit code in right prompt
 RPROMPT="%(?..{%{$fg[red]%}%?%{$reset_color%}})"
@@ -86,19 +92,10 @@ setopt INC_APPEND_HISTORY
 (( ${+EDITOR}  )) || export EDITOR='vim'
 export PSQL_EDITOR='vim -c"setf sql"'
 
-# aliases
-alias ll="ls -l"
-alias la="ls -a"
-alias l.='ls -ld .[^.]*'
-alias lsd='ls -ld *(-/DN)'
-alias md='mkdir -p'
-alias rd='rmdir'
-alias cd..='cd ..'
-alias ..='cd ..'
-alias groutes='rake routes | grep $@'
-
-# set cd autocompletion to commonly visited directories
-cdpath=(~ ~/src $DEV_DIR $HASHROCKET_DIR)
+# Aliases
+# * Additional aliases are found in `.sharedrc`
+#
+alias reload='source ~/.zshrc; echo -e "\n\u2699  \e[33mZSH config reloaded\e[0m \u2699"'
 
 # rvm-install added line:
 if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
@@ -114,5 +111,10 @@ compctl -g '*.feature' -W features cuke
 zrcl="$HOME/.zshrc.local"
 [[ ! -a $zrcl ]] || source $zrcl
 
+# set cd autocompletion to commonly visited directories
+cdpath=(~ ~/src $DEV_DIR $SOURCE_DIR)
+
 # remove duplicates in $PATH
 typeset -aU path
+
+command -v brew > /dev/null && [[ -s $(brew --prefix)/etc/profile.d/autojump.sh ]] && . $(brew --prefix)/etc/profile.d/autojump.sh 

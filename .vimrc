@@ -1,18 +1,16 @@
-filetype off
 if $VIM_PLUGINS != 'NO'
-	if filereadable(expand("~/.vim/autoload/pathogen.vim"))
-		runtime! autoload/pathogen.vim
-		if exists('g:loaded_pathogen')
-			execute pathogen#infect('~/.vimbundles/{}', '~/.vim/bundle/{}')
-		else
-			echo "Failed autoloading plugiins"
-		endif
-	else
-		echo "pathogen file not readable"
-	endif
+  if filereadable(expand('~/.vimbundle'))
+    source ~/.vimbundle
+  endif
+  runtime! ftplugin/man.vim
 endif
+
 syntax on
 filetype plugin indent on
+
+set ignorecase
+set smartcase
+set number
 
 set visualbell
 
@@ -28,10 +26,42 @@ set guifont=Monaco:h16
 set guioptions-=T guioptions-=e guioptions-=L guioptions-=r
 set shell=bash
 
+set conceallevel=0
+let g:vim_json_syntax_conceal = 0
+
 augroup vimrc
   autocmd!
   autocmd GuiEnter * set columns=120 lines=70 number
 augroup END
+
+" shows the output from prettier - useful for syntax errors
+nnoremap <leader>pt :!prettier %<CR>
+
+" Plugin Configuration: {{{
+
+  " ALE: {{{
+    let g:ale_sign_error = 'X'
+    let g:ale_sign_warning = '!'
+    highlight link ALEWarningSign ErrorMsg
+    highlight link ALEErrorSign WarningMsg
+    nnoremap <silent> <leader>ne :ALENextWrap<CR>
+    nnoremap <silent> <leader>pe :ALEPreviousWrap<CR>
+
+    let g:ale_fixers = {
+          \   'bash': ['shfmt'],
+          \   'elixir': ['mix_format'],
+          \   'javascript': ['prettier'],
+          \   'javascript.jsx': ['prettier'],
+          \   'json': ['prettier'],
+          \   'ruby': ['rubocop'],
+          \   'scss': ['prettier'],
+          \   'zsh': ['shfmt'],
+          \}
+
+    let g:ale_fix_on_save = 1
+  " }}}
+
+" }}}
 
 if filereadable(expand('~/.vimrc.local'))
   source ~/.vimrc.local
