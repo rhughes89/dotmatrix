@@ -21,3 +21,12 @@ alias rm='rm -I --preserve-root'
 ## Human readable defaults ##
 alias df='df -H'
 alias du='du -ch'
+
+function vim() {
+  if command -v nvim &> /dev/null; then
+	  echo "opening NeoVim";
+    command nvim "$@"
+  else
+    command vim "$@"
+  fi
+}
